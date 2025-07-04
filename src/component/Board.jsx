@@ -2,7 +2,7 @@ import Card from "./Card"
 
 export default function Board(){
 
-    const deck = [
+    const UNOdeck = [
                 {color:"red", value:0},
                 {color:"red", value:1},
                 {color:"red", value:1},
@@ -107,24 +107,30 @@ export default function Board(){
                 {color:"green", value:"+2"},
                 {color:"green", value:"+2"},
 
-                {color:"wild", value:"draw4"},
-                {color:"wild", value:"draw4"},
-                {color:"wild", value:"draw4"},
-                {color:"wild", value:"draw4"},
+                {color:"wild", value:"+4"},
+                {color:"wild", value:"+4"},
+                {color:"wild", value:"+4"},
+                {color:"wild", value:"+4"},
                 {color:"wild", value:"wild"},
                 {color:"wild", value:"wild"},
                 {color:"wild", value:"wild"},
                 {color:"wild", value:"wild"},
     ]
 
+    const shuffDeck = (deck)=>{
+        for(let i = deck.length-1; i>=0;i--){
+            const j = Math.floor(Math.random()*(i+1));
+            [deck[j],deck[i]]=[deck[i],deck[j]]
+        }
+        return deck
+    }
+
+    // calling the function inside itself to reduce duplicates
+    const shuffeled = shuffDeck(shuffDeck([...UNOdeck]))
+
     return (
         <div>
-            <Card color="red" value="7" />
-            <Card color="green" value="+2" />
-            <Card color="green" value="reverse" />
-            <Card color="red" value="skip" />
-            <Card color="wild" value="+4" />
-            <Card color="wild" value="wild" />
+            <Card color={shuffeled[0].color} value={shuffeled[0].value} />
         </div>
     )
 }
