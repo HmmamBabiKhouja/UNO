@@ -121,8 +121,8 @@ export default function Board(){
         <div>
             <Card color="red" value="7" />
             <Card color="green" value="+2" />
-            <Card color="blue" value="reverse" />
-            <Card color="yellow" value="skip" />
+            <Card color="green" value="reverse" />
+            <Card color="red" value="skip" />
             <Card color="wild" value="+4" />
             <Card color="wild" value="wild" />
         </div>

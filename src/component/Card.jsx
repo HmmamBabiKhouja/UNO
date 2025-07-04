@@ -1,14 +1,14 @@
-import Reverse from "../SVG/retrun-cleaned.svg?react"
-import Skip from "../SVG/road-sign-arrow-svgrepo-com.svg?react"
-import ColorChange from "../SVG/download.svg?react"
+import ReverseIcon from "../SVG/retrun-cleaned.svg?react"
+import SkipIcon from "../SVG/road-sign-arrow-svgrepo-com.svg?react"
+import WildIcon from "../SVG/download.svg?react"
 
 export default function Card({color, value}) {
+    const isWild = color === "wild" 
     let displayValue = value;
     const isSkip = value === "skip";
     const isReverse = value === "reverse"
     const isChangeColor = value === "wild"
-    // const isDrawFour = value === "draw4"
-    const isWild = color === "wild" 
+    const isNumberCard = !isReverse && !isSkip && !isChangeColor;
 
     const WildCard =()=>(
         <div className="table-squares">
@@ -22,10 +22,10 @@ export default function Card({color, value}) {
     return (
         <div className={`card card-${color}`}>
             <div className="card-content">
-                {isReverse && <div className="card-value"><Reverse className="card-icon"/></div>}
-                {isSkip && <div className="card-value"><Skip className="card-icon"/></div>}
-                {isChangeColor && <div className="card-value"><ColorChange className="card-icon"/></div>}
-                {!isReverse && !isSkip && !isChangeColor && (<span className="card-value">{displayValue}</span>)}
+                {isReverse && <div className="card-value"><ReverseIcon className="card-icon"/></div>}
+                {isSkip && <div className="card-value"><SkipIcon className="card-icon"/></div>}
+                {isChangeColor && <div className="card-value"><WildIcon className="card-icon"/></div>}
+                {isNumberCard && (<span className="card-value">{displayValue}</span>)}
                 {isWild && <WildCard />}
             </div>
         </div>
