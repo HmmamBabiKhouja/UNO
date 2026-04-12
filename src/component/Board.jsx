@@ -1,3 +1,5 @@
-import Deck from "./Deck"
-import Hand from "./Hand"
+import {getNewShffledDeck} from "./Card"
 
+export default function Board(){
+    
+}

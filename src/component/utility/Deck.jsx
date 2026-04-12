@@ -1,8 +1,6 @@
-import Card from "./Card"
+import Card from "../Card"
 
-export default function Deck(){
-
-    const UNOdeck = [
+const UNOdeck = [
                 {color:"red", value:0},
                 {color:"red", value:1},
                 {color:"red", value:1},
@@ -115,26 +113,26 @@ export default function Deck(){
                 {color:"wild", value:"wild"},
                 {color:"wild", value:"wild"},
                 {color:"wild", value:"wild"},
-    ]
+];
 
-    const shuffDeck = (deck)=>{
-        for(let i = deck.length-1; i>=0;i--){
+
+export const shuffleDeck = (deck)=>{
+    let newDeck = [...deck]    
+    for(let i = newDeck.length-1; i>=0;i--){
             const j = Math.floor(Math.random()*(i+1));
-            [deck[j],deck[i]]=[deck[i],deck[j]]
-        }
-        return deck
+            [newDeck[j],newDeck[i]]=[newDeck[i],newDeck[j]]
     }
+    return newDeck
+};
 
-    const shuffeled = shuffDeck([...UNOdeck])
-
-    return (
-        <div className="hand">{
-            shuffeled.slice(0,7).map((card, index)=>(
-                <Card
-                    key={`${card.color}-${card.value}-${index}`}
-                    color={card.color}
-                    value={card.value}/>
-            ))
-        }</div>
-    )
-}
+export const getNewShffledDeck = () => dshuffleDeck(UNOdeck)
+   //return (
+        // <div className="hand">{
+        //     shuffeled.slice(0,7).map((card, index)=>(
+        //         <Card
+        //             key={`${card.color}-${card.value}-${index}`}
+        //             color={card.color}
+        //             value={card.value}/>
+        //     ))
+        // }</div>
+    //)
