@@ -1,9 +1,9 @@
 import './index.css'
-import Board from'./component/Board'
+import Deck from'./component/Deck'
 
 export default function App() {
   return(
-    <Board />
+    <Deck />
   )
 }
 
