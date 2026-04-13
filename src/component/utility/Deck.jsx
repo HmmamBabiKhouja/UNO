@@ -125,7 +125,7 @@ export const shuffleDeck = (deck)=>{
     return newDeck
 };
 
-export const getNewShffledDeck = () => dshuffleDeck(UNOdeck)
+export const getNewShffledDeck = () => shuffleDeck(UNOdeck)
    //return (
         // <div className="hand">{
         //     shuffeled.slice(0,7).map((card, index)=>(
