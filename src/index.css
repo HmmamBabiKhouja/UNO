@@ -33,7 +33,7 @@ html{
 .card{
   width: 6rem;
   height: 8rem;
-  border-radius: 1rem;
+  border-radius: 0.8rem;
   margin: 0.8rem;
   box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);
   color: white;
@@ -60,10 +60,10 @@ html{
 }
 
 .card-value {
-  width: 3.75rem;
-  height: 5.5rem;
+  width: 3.55rem;
+  height: 5.1rem;
   background-color: white;
-  border-radius: 0.6rem;
+  border-radius: 0.4rem;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -125,3 +125,34 @@ html{
   height: 100%;
 }
 
+.game{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 20px;
+}
+
+.board{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:40px;
+  border: 2px solid blue;
+
+}
+
+.hand{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-self: center;
+}
+
+.comp-hand{
+  
+}
+
+.player-hand{
+  
+}

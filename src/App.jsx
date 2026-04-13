@@ -1,5 +1,5 @@
 import './index.css'
-import Game from './game'
+import Game from './Game'
 
 export default function App() {
   return(

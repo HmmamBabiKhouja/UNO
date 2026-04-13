@@ -1,19 +1,22 @@
 import {useState, useEffect} from "react";
 import {getNewShffledDeck} from "./component/utility/Deck";
 import Card from "./component/Card"
+import Board from "./component/Board"
 import _default from "eslint-plugin-react-refresh";
 
 
 export default function Game(){
     const [deck, setDeck] = useState([]);
     const [playerHand, setPlayerHand] = useState([]);
+    const [compHand, setCompHand] = useState([])
     const [drawPile, setDrawPile] = useState([]);
     const [discardPile, setDiscardPile] = useState([])
     const topCard = discardPile[discardPile.length-1]
 
     useEffect(() =>{
         const newDeck = getNewShffledDeck();
-        const playerCards = newDeck.slice(0,7)
+        const playerCards = newDeck.slice(0,7);
+        const compCards = newDeck.slice(7, 14);
         const remainingDeck = newDeck.slice(7);
         const firstCard = remainingDeck.pop()
 
@@ -21,6 +24,7 @@ export default function Game(){
         setDrawPile(remainingDeck)
         setDiscardPile([firstCard])
         setPlayerHand(playerCards);
+        setCompHand(compCards);
     },[])
 
     const playCard =(card, index)=>{
@@ -46,17 +50,23 @@ export default function Game(){
     }
 
     return (
-        <div>
-
-            <button onClick={drawCard}> darw</button>
-            {topCard && (
-                <Card 
-                color={topCard.color}
-                value={topCard.value}
-                />
-            )}
-
-            <div className="hand">
+        <div className="game">
+            <div className="hand comp-hand">
+                {compHand.map((card, index)=>(
+                    <Card 
+                        key={`${card.color}-${card.value}-${index}`}
+                        color={card.color}
+                        value={card.value}
+                    />
+                ))}
+            </div>
+            <Board 
+                drawPile={drawPile} 
+                discardPile={discardPile} 
+                topCard={topCard} 
+                drawCard={drawCard} 
+            />
+            <div className="hand player-hand">
                 {playerHand.map((card, index)=>(
                     <Card
                     key={`${card.color}-${card.value}-${index}`}
