@@ -115,7 +115,6 @@ const UNOdeck = [
                 {color:"wild", value:"colorful"},
 ];
 
-
 export const shuffleDeck = (deck)=>{
     let newDeck = [...deck]    
     for(let i = newDeck.length-1; i>=0;i--){
