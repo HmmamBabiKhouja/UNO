@@ -19,12 +19,12 @@ export default function Game(){
 
         setDeck(newDeck);
         setDrawPile(remainingDeck)
-        setDiscardPile(firstCard)
+        setDiscardPile([firstCard])
         setPlayerHand(playerCards);
     },[])
 
     const playCard =(card, index)=>{
-        const topCard = discardPile(discardPile.length-1)
+        const topCard = discardPile[discardPile.length-1]
 
         if(card.color === topCard.color ||
             card.value === topCard.value ||
@@ -39,7 +39,7 @@ export default function Game(){
     const drawCard =()=>{
         if(drawPile.length=== 0) return 
 
-        const newCard = drawPile(drawPile.length-1)
+        const newCard = drawPile[drawPile.length-1]
 
         setDrawPile(prev => prev.slice(0, -1))
         setPlayerHand(prev=>[...prev, newCard])
