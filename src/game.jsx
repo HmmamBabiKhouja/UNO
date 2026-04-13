@@ -17,7 +17,7 @@ export default function Game(){
         const newDeck = getNewShffledDeck();
         const playerCards = newDeck.slice(0,7);
         const compCards = newDeck.slice(7, 14);
-        const remainingDeck = newDeck.slice(7);
+        const remainingDeck = newDeck.slice(14);
         const firstCard = remainingDeck.pop()
 
         setDeck(newDeck);
@@ -27,14 +27,17 @@ export default function Game(){
         setCompHand(compCards);
     },[])
 
-    const playCard =(card, index)=>{
+    const playCard =(card, index, hand)=>{
         const topCard = discardPile[discardPile.length-1]
-
+        
         if(card.color === topCard.color ||
             card.value === topCard.value ||
-            card.value === "wild"){
-
-                setPlayerHand(prev => prev.filter ((_, i) =>i!== index))
+            card.color === "wild"){
+                if(hand==="player"){
+                    setPlayerHand(prev => prev.filter ((_, i) =>i!== index))
+                }else{
+                    setCompHand(prev =>prev.filter((_,i)=>i!==index))
+                }
 
                 setDiscardPile(prev => [...prev, card])
             }
@@ -49,6 +52,10 @@ export default function Game(){
         setPlayerHand(prev=>[...prev, newCard])
     }
 
+    const plus4 =()=>{
+
+    }
+
     return (
         <div className="game">
             <div className="hand comp-hand">
@@ -57,6 +64,7 @@ export default function Game(){
                         key={`${card.color}-${card.value}-${index}`}
                         color={card.color}
                         value={card.value}
+                        onClick ={ ()=> playCard(card, index, "computer")}
                     />
                 ))}
             </div>
@@ -72,7 +80,7 @@ export default function Game(){
                     key={`${card.color}-${card.value}-${index}`}
                     color={card.color}
                     value={card.value}
-                    onClick ={ ()=> playCard(card, index)}
+                    onClick ={ ()=> playCard(card, index, "player")}
                     />
                 ))}
             </div>

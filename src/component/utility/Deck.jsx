@@ -109,10 +109,10 @@ const UNOdeck = [
                 {color:"wild", value:"+4"},
                 {color:"wild", value:"+4"},
                 {color:"wild", value:"+4"},
-                {color:"wild", value:"wild"},
-                {color:"wild", value:"wild"},
-                {color:"wild", value:"wild"},
-                {color:"wild", value:"wild"},
+                {color:"wild", value:"colorful"},
+                {color:"wild", value:"colorful"},
+                {color:"wild", value:"colorful"},
+                {color:"wild", value:"colorful"},
 ];
 
 
@@ -126,13 +126,3 @@ export const shuffleDeck = (deck)=>{
 };
 
 export const getNewShffledDeck = () => shuffleDeck(UNOdeck)
-   //return (
-        // <div className="hand">{
-        //     shuffeled.slice(0,7).map((card, index)=>(
-        //         <Card
-        //             key={`${card.color}-${card.value}-${index}`}
-        //             color={card.color}
-        //             value={card.value}/>
-        //     ))
-        // }</div>
-    //)

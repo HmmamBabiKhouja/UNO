@@ -1,12 +1,12 @@
 import ReverseIcon from "../SVG/retrun-cleaned.svg?react"
 import SkipIcon from "../SVG/road-sign-arrow-svgrepo-com.svg?react"
-import WildIcon from "../SVG/download.svg?react"
+import ColorfulIcon from "../SVG/download.svg?react"
 
-export default function Card({color, value}) {
+export default function Card({color, value, onClick}) {
     const icons = {
         skip : SkipIcon,
         reverse : ReverseIcon,
-        wild : WildIcon,
+        colorful : ColorfulIcon,
     };
     const Icon = icons[value];
     
@@ -21,7 +21,7 @@ export default function Card({color, value}) {
     )
 
     return (
-        <div className={`card card-${color}`}>
+        <div className={`card card-${color}`} onClick={onClick}>
             <div className="card-content">
                 {Icon ?
                     (<div className="card-value">
