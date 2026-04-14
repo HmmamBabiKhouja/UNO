@@ -79,22 +79,30 @@ html{
   pointer-events: none;
 }
 
-.card-red,.square-red{
+.card-red,
+.square-red,
+.background-red{
   background: var(--red);
   color: var(--red);
 }
 
-.card-blue,.square-blue {
+.card-blue,
+.square-blue,
+.background-blue {
   background: var(--blue);
   color: var(--blue);
 }
 
-.card-green,.square-green{
+.card-green,
+.square-green,
+.background-green{
   background: var(--green);
   color: var(--green);
 }
 
-.card-yellow,.square-yellow{
+.card-yellow,
+.square-yellow,
+.background-yellow{
   background: var(--yellow);
   color: var(--yellow);
 }
@@ -138,7 +146,6 @@ html{
   justify-content: center;
   align-items: center;
   gap:40px;
-  border: 2px solid blue;
 
 }
 
@@ -149,10 +156,49 @@ html{
   align-self: center;
 }
 
-.comp-hand{
+.color-picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
 }
 
-.player-hand{
-  
+.color-picker {
+  background: #1e1e1e;
+  padding: 20px 30px;
+  border-radius: 15px;
+  text-align: center;
+  color: white;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.color-options {
+  display: grid;
+  grid-template-columns: repeat(2, 80px);
+  gap: 15px;
+  justify-content: center;
+}
+
+.color-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.color-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(255,255,255,0.3);
 }

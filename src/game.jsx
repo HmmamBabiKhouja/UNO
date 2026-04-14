@@ -3,6 +3,7 @@ import {getNewShffledDeck} from "./component/utility/Deck";
 import Card from "./component/Card"
 import Board from "./component/Board"
 import _default from "eslint-plugin-react-refresh";
+import ColorPicker from "./component/ColorPicker";
 
 
 export default function Game(){
@@ -13,7 +14,11 @@ export default function Game(){
     const [discardPile, setDiscardPile] = useState([])
     const [currentColor, setCurrentColor] = useState(null);
     const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+    const [showPicker, setShowPicker] = useState(false)
+    const [backGroundColor, setBackGroundColor] = useState([])
     const topCard = discardPile[discardPile.length-1]
+
+    
 
     useEffect(() =>{
         const newDeck = getNewShffledDeck();
@@ -23,12 +28,20 @@ export default function Game(){
         const firstCard = remainingDeck.pop()
 
         setDeck(newDeck);
-        setDrawPile(remainingDeck)
-        setDiscardPile([firstCard])
         setPlayerHand(playerCards);
         setCompHand(compCards);
-        setCurrentColor(firstCard.color === "wild" ? "red" : firstCard.color); // default to red for wild
+        setDrawPile(remainingDeck)
+        setDiscardPile([firstCard])
+        setCurrentColor(firstCard.color === "wild" ? "red" : firstCard.color); 
+        setBackGroundColor(firstCard.color)// default to red for wild
     },[])
+
+    const handleColorPicker =(color)=>{
+        setCurrentColor(color)
+        setShowPicker(false)
+        setBackGroundColor(color)
+        
+    }
 
     const playCard =(card, index, hand)=>{
         const topCard = discardPile[discardPile.length-1]
@@ -48,9 +61,7 @@ export default function Game(){
 
                 // Handle special cards
                 if(card.color === "wild" || card.value === "+4"){
-                    // For simplicity, set to red; in real game, prompt user
-                    setCurrentColor("red");
-                    alert("is's red")
+                    setShowPicker(true)
                 }
                 if(card.value === "+4"){
                     // Draw 4 cards for the opponent
@@ -78,12 +89,9 @@ export default function Game(){
         setIsPlayerTurn(false); // end turn after drawing
     }
 
-    const plus4 =()=>{
-
-    }
-
     return (
-        <div className="game">
+        <div className={`game background-${backGroundColor}`}>
+            {showPicker && <ColorPicker onPick={handleColorPicker}/>}
             <div className="hand comp-hand">
                 {compHand.map((card, index)=>(
                     <Card 
