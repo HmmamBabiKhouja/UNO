@@ -18,8 +18,6 @@ export default function Game(){
     const [backGroundColor, setBackGroundColor] = useState([])
     const topCard = discardPile[discardPile.length-1]
 
-    
-
     useEffect(() =>{
         const newDeck = getNewShffledDeck();
         const playerCards = newDeck.slice(0,7);
@@ -32,7 +30,7 @@ export default function Game(){
         setCompHand(compCards);
         setDrawPile(remainingDeck)
         setDiscardPile([firstCard])
-        setCurrentColor(firstCard.color === "wild" ? "red" : firstCard.color); 
+        setCurrentColor(firstCard.color === "wild" ? removeWildBeggin(firstCard): firstCard.color); 
         setBackGroundColor(firstCard.color)// default to red for wild
     },[])
 
@@ -41,6 +39,14 @@ export default function Game(){
         setShowPicker(false)
         setBackGroundColor(color)
         
+    }
+
+    const removeWildBeggin =(card)=>{
+        alert("hi")
+        const randomIndex = Math.floor(Math.random() * drawPile.length);
+        const newPile = [...drawPile];
+        newPile[randomIndex]=card
+        setDrawPile(newPile)
     }
 
     const playCard =(card, index, hand)=>{
@@ -58,7 +64,6 @@ export default function Game(){
                 }
 
                 setDiscardPile(prev => [...prev, card])
-
                 // Handle special cards
                 if(card.color === "wild" || card.value === "+4"){
                     setShowPicker(true)
@@ -80,13 +85,23 @@ export default function Game(){
     }
 
     const drawCard =()=>{
-        if(drawPile.length=== 0 || !isPlayerTurn) return 
+        if(drawPile.length=== 0){
+            const newDeck = getNewShffledDeck();
+            setDeck(newDeck);
+        } 
 
         const newCard = drawPile[drawPile.length-1]
 
         setDrawPile(prev => prev.slice(0, -1))
-        setPlayerHand(prev=>[...prev, newCard])
-        setIsPlayerTurn(false); // end turn after drawing
+        if(isPlayerTurn){
+            setPlayerHand(prev=>[...prev, newCard])
+            setIsPlayerTurn(false); // end turn after drawing
+        }else if(!isPlayerTurn){
+            setCompHand(prev=>[...prev, newCard])
+            setIsPlayerTurn(true); // end turn after drawing
+        }else{
+            return
+        }
     }
 
     return (
