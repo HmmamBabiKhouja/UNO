@@ -28,10 +28,16 @@ export default function Game(){
         setDeck(newDeck);
         setPlayerHand(playerCards);
         setCompHand(compCards);
-        setDrawPile(remainingDeck)
-        setDiscardPile([firstCard])
-        setCurrentColor(firstCard.color === "wild" ? removeWildBeggin(firstCard): firstCard.color); 
-        setBackGroundColor(firstCard.color)// default to red for wild
+        if(firstCard.color === "wild"){
+            const initialColor = removeWildBeggin(firstCard, remainingDeck);
+            setCurrentColor(initialColor);
+            setBackGroundColor(initialColor);
+        } else {
+            setDrawPile(remainingDeck);
+            setDiscardPile([firstCard]);
+            setCurrentColor(firstCard.color);
+            setBackGroundColor(firstCard.color);
+        }
     },[])
 
     const handleColorPicker =(color)=>{
@@ -41,17 +47,23 @@ export default function Game(){
         
     }
 
-    const removeWildBeggin =(card)=>{
-        alert("hi")
-        const randomIndex = Math.floor(Math.random() * drawPile.length);
-        const newPile = [...drawPile];
-        newPile[randomIndex]=card
-        setDrawPile(newPile)
+    const removeWildBeggin =(card, pile)=>{
+        const randomIndex = Math.floor(Math.random() * pile.length);
+        const newPile = [...pile];
+        const replacementCard = newPile[randomIndex];
+        newPile[randomIndex] = card;
+        setDrawPile(newPile);
+        setDiscardPile([replacementCard]);
+        return replacementCard.color;
     }
 
     const playCard =(card, index, hand)=>{
+
         const topCard = discardPile[discardPile.length-1]
-        
+        console.log("on the pile "+"  "+topCard.color+topCard.value)
+        console.log("current color "+"  "+ currentColor)
+        console.log("card to play "+ card.color+"  "+ card.value)
+
         if(card.color === currentColor ||
             card.value === topCard.value ||
             card.color === "wild"){
@@ -78,7 +90,6 @@ export default function Game(){
                         setPlayerHand(prev => [...prev, ...cardsToDraw]);
                     }
                 }
-
                 // Switch turns
                 setIsPlayerTurn(prev => !prev);
             }
