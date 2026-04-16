@@ -10,10 +10,12 @@ export default function Board({ drawPile, discardPile, topCard, drawCard }){
             </div>
             <div className="discard-pile">
                 {topCard && (
-                    <Card
+                    <div className="discard-card">
+                        <Card
                         color={topCard.color}
                         value={topCard.value}
-                    />
+                        />
+                    </div>
                 )}
             </div>
         </div>

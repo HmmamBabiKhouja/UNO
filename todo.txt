@@ -1,0 +1,4 @@
+1 - do function for reverse
+2 - player can still play when draw card
+3 - when the card on the hands of one ends that mean win
+4 - do make logic for the computer to play

@@ -4,6 +4,7 @@ import Card from "./component/Card"
 import Board from "./component/Board"
 import _default from "eslint-plugin-react-refresh";
 import ColorPicker from "./component/ColorPicker";
+import Hand from "./component/Hand"
 
 
 export default function Game(){
@@ -44,7 +45,6 @@ export default function Game(){
         setCurrentColor(color)
         setShowPicker(false)
         setBackGroundColor(color)
-        
     }
 
     const removeWildBeggin =(card, pile)=>{
@@ -60,9 +60,6 @@ export default function Game(){
     const playCard =(card, index, hand)=>{
 
         const topCard = discardPile[discardPile.length-1]
-        console.log("on the pile "+"  "+topCard.color+topCard.value)
-        console.log("current color "+"  "+ currentColor)
-        console.log("card to play "+ card.color+"  "+ card.value)
 
         if(card.color === currentColor ||
             card.value === topCard.value ||
@@ -75,21 +72,33 @@ export default function Game(){
                     return; // not your turn
                 }
 
+                if(card.value===topCard.value){
+                    setCurrentColor(card.color)
+                    setBackGroundColor(card.color)
+                }// update current color when cards played by value
+
                 setDiscardPile(prev => [...prev, card])
                 // Handle special cards
-                if(card.color === "wild" || card.value === "+4"){
+                if(card.color === "wild"){
                     setShowPicker(true)
                 }
-                if(card.value === "+4"){
+                
+                if(card.value === "+4"||card.value==="+2"){
+                    const cardsToAdd = parseInt(card.value, 10)
                     // Draw 4 cards for the opponent
-                    const cardsToDraw = drawPile.slice(-4);
-                    setDrawPile(prev => prev.slice(0, -4));
+                    const cardsToDraw = drawPile.slice(-cardsToAdd);
+                    setDrawPile(prev => prev.slice(0, -cardsToAdd));
                     if(hand === "player"){
                         setCompHand(prev => [...prev, ...cardsToDraw]);
                     }else{
                         setPlayerHand(prev => [...prev, ...cardsToDraw]);
                     }
                 }
+
+                if(card.value === "skip") return
+                //this is temp unitll making it 4 players
+                if(card.value === "reverse") return 
+
                 // Switch turns
                 setIsPlayerTurn(prev => !prev);
             }
@@ -100,10 +109,10 @@ export default function Game(){
             const newDeck = getNewShffledDeck();
             setDeck(newDeck);
         } 
-
+        
         const newCard = drawPile[drawPile.length-1]
-
         setDrawPile(prev => prev.slice(0, -1))
+        
         if(isPlayerTurn){
             setPlayerHand(prev=>[...prev, newCard])
             setIsPlayerTurn(false); // end turn after drawing
@@ -118,32 +127,22 @@ export default function Game(){
     return (
         <div className={`game background-${backGroundColor}`}>
             {showPicker && <ColorPicker onPick={handleColorPicker}/>}
-            <div className="hand comp-hand">
-                {compHand.map((card, index)=>(
-                    <Card 
-                        key={`${card.color}-${card.value}-${index}`}
-                        color={card.color}
-                        value={card.value}
-                        onClick ={ ()=> playCard(card, index, "computer")}
-                    />
-                ))}
-            </div>
+            <Hand 
+                className="hand comp-hand"
+                cards={compHand}
+                onCardClick={(card, index)=> playCard(card, index,"computer" )}
+            />
             <Board 
                 drawPile={drawPile} 
                 discardPile={discardPile} 
                 topCard={topCard} 
                 drawCard={drawCard} 
             />
-            <div className="hand player-hand">
-                {playerHand.map((card, index)=>(
-                    <Card
-                    key={`${card.color}-${card.value}-${index}`}
-                    color={card.color}
-                    value={card.value}
-                    onClick ={ ()=> playCard(card, index, "player")}
-                    />
-                ))}
-            </div>
+            <Hand 
+                className="hand player-hand"
+                cards={playerHand}
+                onCardClick={(card, index)=> playCard(card, index, "player")}
+            />
         </div>
         
     )

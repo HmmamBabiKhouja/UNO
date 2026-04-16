@@ -11,7 +11,6 @@ body{
   --white: #f0f0f0;
 }
 
-
 body,
 html{
   margin: 0;
@@ -21,7 +20,7 @@ html{
   font-family: "Comic Sans MS", "Comic Sans", cursive;
   /* color: rgba(255, 255, 255, 0.87); */
   background-color: var(--white);
-
+  overflow: hidden;
 }
 
 :root {
@@ -35,7 +34,7 @@ html{
   height: 8rem;
   border-radius: 0.8rem;
   margin: 0.8rem;
-  box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);
+  box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.3);
   color: white;
   font-size: 1.5rem;
   
@@ -51,6 +50,7 @@ html{
 
 .card:hover{
   transform: translateY(-1rem);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
 
 .card-content{
@@ -146,14 +146,27 @@ html{
   justify-content: center;
   align-items: center;
   gap:40px;
+}
+
+.discard-pile .card{
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    /* box-shadow: 0 10px 20px rgba(0,0,0,0.5); */
 
 }
 
+.discard-pile .card:hover {
+  transform: none;
+}
+
 .hand{
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  align-self: center;
+  position: relative;
+  height: 200px;
+  width: 100%;
+  transform: translate(0,-50px)
+}
+
+.comp-hand{
+  transform: translate(0,50px) rotate(180deg);
 }
 
 .color-picker-overlay {
@@ -201,4 +214,15 @@ html{
 .color-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+}
+
+.card-wrapper {
+  position: absolute;
+  bottom: 0;
+  transition: transform 0.2s;
+}
+
+.card-wrapper:hover {
+  transform: translateY(-20px) scale(1.1);
+  z-index: 10;
 }
