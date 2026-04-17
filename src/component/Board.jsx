@@ -1,12 +1,12 @@
 import Card from "./Card"
+import CardBack from "./utility/CardBack"
 
 export default function Board({ drawPile, discardPile, topCard, drawCard }){
     return (
         <div className="board">
             <div className="draw-pile">
-                <button onClick={drawCard} className="draw-button">
-                    Draw Card ({drawPile.length} left)
-                </button>
+                <CardBack onClick={drawCard} className="draw-button">
+                </CardBack>
             </div>
             <div className="discard-pile">
                 {topCard && (

@@ -105,6 +105,7 @@ export default function Game(){
     }
 
     const drawCard =()=>{
+        console.log("hi")
         if(drawPile.length=== 0){
             const newDeck = getNewShffledDeck();
             setDeck(newDeck);
