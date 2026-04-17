@@ -65,9 +65,13 @@ export default function Game(){
             card.value === topCard.value ||
             card.color === "wild"){
                 if(hand==="player" && isPlayerTurn){
-                    setPlayerHand(prev => prev.filter ((_, i) =>i!== index))
+                    const updatedPlayerHand = playerHand.filter ((_, i) =>i!== index)
+                    setPlayerHand(updatedPlayerHand)
+                    if(updatedPlayerHand.length===0) alert("you are the winner")
                 }else if(hand==="computer" && !isPlayerTurn){
-                    setCompHand(prev =>prev.filter((_,i)=>i!==index))
+                    const updatedCompHand = compHand.filter((_, i)=> i!==index)
+                    setCompHand(updatedCompHand)
+                    if(updatedCompHand.length===0) alert ("sorry you lost")
                 }else{
                     return; // not your turn
                 }
@@ -98,14 +102,14 @@ export default function Game(){
                 if(card.value === "skip") return
                 //this is temp unitll making it 4 players
                 if(card.value === "reverse") return 
-
+                
+                
                 // Switch turns
                 setIsPlayerTurn(prev => !prev);
             }
     }
 
     const drawCard =()=>{
-        console.log("hi")
         if(drawPile.length=== 0){
             const newDeck = getNewShffledDeck();
             setDeck(newDeck);

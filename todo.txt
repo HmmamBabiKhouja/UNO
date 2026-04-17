@@ -1,6 +1,7 @@
-1 - do function for reverse
-2 - player can still play when draw card
-3 - when the card on the hands of one ends that mean win
-4 - do make logic for the computer to play
-5 - hide the computer cards 
-
+* - do function for reverse
+* - player can still play when draw card
+* - when the card on the hands of one ends that mean win
+* - do make logic for the computer to play
+* - hide the computer cards 
+* - when hand is empty of cards we got winner // done but it need styling for winner
+* - rearrange cards on the hand of player upon color and downward
