@@ -5,3 +5,5 @@
 * - hide the computer cards 
 * - when hand is empty of cards we got winner // done but it need styling for winner
 * - rearrange cards on the hand of player upon color and downward
+* - restyle the uno cards as real uno cards
+* - remove the square thing and replace it with rotated oval mixed colors

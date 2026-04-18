@@ -251,19 +251,19 @@ html{
 .card.back::before {
   content: "";
   position: absolute;
-  width: 120%;
+  width: 144%;
   height: 60%;
   background: red;
   border-radius: 50%;
-  transform: rotate(-20deg);
+  transform: rotate(-64deg);
 }
 
 /* UNO text */
 .uno-logo {
   position: relative;
   font-weight: 700;
-  font-size: 2.1rem;
+  font-size: 2rem;
   color: yellow;
-  transform: rotate(-20deg);
+  transform: rotate(-64deg);
   z-index: 1;
 }
