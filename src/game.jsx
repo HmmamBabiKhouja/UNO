@@ -21,8 +21,8 @@ export default function Game(){
 
     useEffect(() =>{
         const newDeck = getNewShffledDeck();
-        const playerCards = newDeck.slice(0,7);
-        const compCards = newDeck.slice(7, 14);
+        const playerCards = arrangeCards(newDeck.slice(0,7));
+        const compCards = arrangeCards(newDeck.slice(7, 14));
         const remainingDeck = newDeck.slice(14);
         const firstCard = remainingDeck.pop()
 
@@ -40,6 +40,17 @@ export default function Game(){
             setBackGroundColor(firstCard.color);
         }
     },[])
+
+    const arrangeCards = (handCards)=>{
+        const colors = ["blue", "green", "red", "yellow", "wild"]
+        const newCards = []
+        for(let c = 0; c<colors.length; c++){
+            for(let i =0;i<handCards.length;i++){
+                if(handCards[i].color===colors[c]) newCards.push(handCards[i])
+            }
+        }    
+        return newCards
+    }
 
     const handleColorPicker =(color)=>{
         setCurrentColor(color)
@@ -119,10 +130,10 @@ export default function Game(){
         setDrawPile(prev => prev.slice(0, -1))
         
         if(isPlayerTurn){
-            setPlayerHand(prev=>[...prev, newCard])
+            setPlayerHand(prev => [...prev, newCard])
             setIsPlayerTurn(false); // end turn after drawing
         }else if(!isPlayerTurn){
-            setCompHand(prev=>[...prev, newCard])
+            setCompHand(prev => [...prev, newCard])
             setIsPlayerTurn(true); // end turn after drawing
         }else{
             return

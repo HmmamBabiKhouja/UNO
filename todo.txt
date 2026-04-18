@@ -1,9 +1,7 @@
 * - do function for reverse
 * - player can still play when draw card
-* - when the card on the hands of one ends that mean win
 * - do make logic for the computer to play
 * - hide the computer cards 
 * - when hand is empty of cards we got winner // done but it need styling for winner
-* - rearrange cards on the hand of player upon color and downward
-* - restyle the uno cards as real uno cards
+* - add button to rearrange the cards on the hands or small animation to know what is the card that withdrawn
 * - remove the square thing and replace it with rotated oval mixed colors
