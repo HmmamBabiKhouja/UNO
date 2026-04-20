@@ -22,9 +22,8 @@ export default function Hand({ cards, className, onCardClick }) {
             }}
           >
             <Card 
-              color={card.color}
-              value={card.value}
-              onClick={()=> onCardClick(card, index)}
+              {...card}
+              onClick={() => onCardClick(card, index)}
             />
           </div>
         );

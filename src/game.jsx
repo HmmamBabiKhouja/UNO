@@ -5,6 +5,7 @@ import Board from "./component/Board"
 import _default from "eslint-plugin-react-refresh";
 import ColorPicker from "./component/ColorPicker";
 import Hand from "./component/Hand"
+import WinningScreen from "./component/WinningScreen";
 
 
 export default function Game(){
@@ -16,29 +17,13 @@ export default function Game(){
     const [currentColor, setCurrentColor] = useState(null);
     const [isPlayerTurn, setIsPlayerTurn] = useState(true);
     const [showPicker, setShowPicker] = useState(false)
-    const [backGroundColor, setBackGroundColor] = useState([])
+    const [backGroundColor, setBackGroundColor] = useState(null)
+    const [showWinningScreen, setShowWinningScreen] = useState(false)
+    const [winner, setWinner] = useState("")
     const topCard = discardPile[discardPile.length-1]
 
     useEffect(() =>{
-        const newDeck = getNewShffledDeck();
-        const playerCards = arrangeCards(newDeck.slice(0,7));
-        const compCards = arrangeCards(newDeck.slice(7, 14));
-        const remainingDeck = newDeck.slice(14);
-        const firstCard = remainingDeck.pop()
-
-        setDeck(newDeck);
-        setPlayerHand(playerCards);
-        setCompHand(compCards);
-        if(firstCard.color === "wild"){
-            const initialColor = removeWildBeggin(firstCard, remainingDeck);
-            setCurrentColor(initialColor);
-            setBackGroundColor(initialColor);
-        } else {
-            setDrawPile(remainingDeck);
-            setDiscardPile([firstCard]);
-            setCurrentColor(firstCard.color);
-            setBackGroundColor(firstCard.color);
-        }
+        initGame();
     },[])
 
     const arrangeCards = (handCards)=>{
@@ -68,6 +53,37 @@ export default function Game(){
         return replacementCard.color;
     }
 
+    const initGame = () => {
+        const newDeck = getNewShffledDeck();
+        const playerCards = arrangeCards(newDeck.slice(0,7));
+        const compCards = arrangeCards(newDeck.slice(7, 14));
+        const remainingDeck = newDeck.slice(14);
+        const firstCard = remainingDeck.pop();
+
+        setDeck(newDeck);
+        setPlayerHand(playerCards);
+        setCompHand(compCards);
+        setShowWinningScreen(false);
+        setWinner("");
+        setIsPlayerTurn(true);
+        setShowPicker(false);
+
+        if(firstCard.color === "wild"){
+            const initialColor = removeWildBeggin(firstCard, remainingDeck);
+            setCurrentColor(initialColor);
+            setBackGroundColor(initialColor);
+        } else {
+            setDrawPile(remainingDeck);
+            setDiscardPile([firstCard]);
+            setCurrentColor(firstCard.color);
+            setBackGroundColor(firstCard.color);
+        }
+    }
+
+    const resetCards = ()=>{
+        initGame();
+    }
+
     const playCard =(card, index, hand)=>{
 
         const topCard = discardPile[discardPile.length-1]
@@ -78,11 +94,17 @@ export default function Game(){
                 if(hand==="player" && isPlayerTurn){
                     const updatedPlayerHand = playerHand.filter ((_, i) =>i!== index)
                     setPlayerHand(updatedPlayerHand)
-                    if(updatedPlayerHand.length===0) alert("you are the winner")
+                    if(updatedPlayerHand.length===0){
+                        setShowWinningScreen(true)
+                        setWinner("Player")
+                    }
                 }else if(hand==="computer" && !isPlayerTurn){
                     const updatedCompHand = compHand.filter((_, i)=> i!==index)
                     setCompHand(updatedCompHand)
-                    if(updatedCompHand.length===0) alert ("sorry you lost")
+                    if(updatedCompHand.length===0){
+                        setShowWinningScreen(true)
+                        setWinner("Computer")
+                    }
                 }else{
                     return; // not your turn
                 }
@@ -91,7 +113,6 @@ export default function Game(){
                     setCurrentColor(card.color)
                     setBackGroundColor(card.color)
                 }// update current color when cards played by value
-
                 setDiscardPile(prev => [...prev, card])
                 // Handle special cards
                 if(card.color === "wild"){
@@ -113,8 +134,6 @@ export default function Game(){
                 if(card.value === "skip") return
                 //this is temp unitll making it 4 players
                 if(card.value === "reverse") return 
-                
-                
                 // Switch turns
                 setIsPlayerTurn(prev => !prev);
             }
@@ -126,23 +145,48 @@ export default function Game(){
             setDeck(newDeck);
         } 
         
-        const newCard = drawPile[drawPile.length-1]
+        const drawnCard = drawPile[drawPile.length-1];
+        const newCard = {
+            ...drawnCard,
+            isNew: true
+        }
         setDrawPile(prev => prev.slice(0, -1))
         
         if(isPlayerTurn){
             setPlayerHand(prev => [...prev, newCard])
-            setIsPlayerTurn(false); // end turn after drawing
+            setTimeout(() =>{
+                setPlayerHand(prev => 
+                    prev.map(card=>
+                        card.isNew?{...card, isNew:false}: card
+                    )
+                )
+            }) 
+            setIsPlayerTurn(false); // end turn after drawingd
         }else if(!isPlayerTurn){
+
             setCompHand(prev => [...prev, newCard])
+            setTimeout(()=> {
+                setCompHand(prev =>
+                    prev.map( card =>
+                        card.isNew?{...card, isNew:false}: card
+                    )
+                )
+            })
+            
+            
             setIsPlayerTurn(true); // end turn after drawing
         }else{
             return
         }
+
+
     }
 
     return (
         <div className={`game background-${backGroundColor}`}>
             {showPicker && <ColorPicker onPick={handleColorPicker}/>}
+            {showWinningScreen && <WinningScreen winner={winner} onClick={resetCards}/>}            
+            <button className="rearrange-cards" onClick={() => setPlayerHand(arrangeCards(playerHand))}>Re-arrange cards</button>
             <Hand 
                 className="hand comp-hand"
                 cards={compHand}

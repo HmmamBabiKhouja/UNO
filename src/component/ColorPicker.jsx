@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 export default function ColorPicker({onPick}){
     return (
         <div className="color-picker-overlay">
