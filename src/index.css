@@ -333,3 +333,40 @@ html{
     opacity: 1;
   }
 }
+
+.action-popup {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  
+  background: #264653;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  
+  font-size: 20px;
+  font-weight: bold;
+  
+  opacity: 0;
+  animation: popInOut 1.2s ease forwards;
+}
+
+@keyframes popInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}

@@ -1,11 +1,9 @@
-* - refactor turns - currentplayer
+* - the logic of sides of the game has crashed 
+* - skip and reverse doesnt show the message
 * - computer auto play
 * - add 4 players
-* - add reverse logic
 ------------------------------------------
 * - remove the tilt thing
 * - make +4 and +2 can be overplayed with other +2 and +4
 * - hide the computer cards
 * - remove the square thing and replace it with rotated oval mixed colors
-
-" fix playCard currly braces " 

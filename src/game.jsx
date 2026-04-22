@@ -25,8 +25,6 @@ export default function Game(){
 
     const [actionMsg, setActionMsg] = useState(null)
     const [direction, setDirection] = useState(1)
-    // const [playerHand, setPlayerHand] = useState([]);
-    // const [compHand, setCompHand] = useState([])
     const [drawPile, setDrawPile] = useState([]);
     const [discardPile, setDiscardPile] = useState([])
     const [currentColor, setCurrentColor] = useState(null);
@@ -104,7 +102,7 @@ export default function Game(){
         initGame();
     }
 
-    const playCard =(card, index, hand)=>{
+    const playCard =(card, index)=>{
 
         const topCard = discardPile[discardPile.length-1]
 
@@ -112,9 +110,9 @@ export default function Game(){
             card.value === topCard.value ||
             card.color === "wild"){
                     const updatedPlayerHand = players[currentPlayer].hand.filter ((_, i) =>i!== index)
-                    const updatedPlayers = players.map((player, i)=>{
-                        i===currentPlayer? {...player,hand:updatedPlayerHand}: player;
-                    })
+                    const updatedPlayers = players.map((player, i)=>
+                        i===currentPlayer? {...player,hand:updatedPlayerHand}: player
+                    )
                     setPlayers(updatedPlayers)
                     if(updatedPlayerHand.length===0){
                         setShowWinningScreen(true)
@@ -166,6 +164,7 @@ export default function Game(){
         if(drawPile.length=== 0){
             const newDeck = getNewShffledDeck();
             setDeck(newDeck);
+            setDrawPile(newDeck);
         } 
         
         const drawnCard = drawPile[drawPile.length-1];
@@ -178,22 +177,24 @@ export default function Game(){
             i === currentPlayer ? { ...player, hand: [...player.hand, newCard] } : player
         );
         setPlayers(updatedPlayers);
+        const playerIndex = currentPlayer;
         setTimeout(() =>{
-            const updatedPlayersWithoutNew = players.map((player, i) =>
-                i === currentPlayer ? { ...player, hand: player.hand.map(card =>
+            setPlayers(prevPlayers => prevPlayers.map((player, i) =>
+                i === playerIndex ? { ...player, hand: player.hand.map(card =>
                     card.isNew ? {...card, isNew: false} : card
                 )} : player
-            );
-            setPlayers(updatedPlayersWithoutNew);
+            ));
         }, 600) 
 
         setCurrentPlayer((currentPlayer+direction+players.length)%players.length)
+        console.log(players[currentPlayer].hand)
     }
 
     return (
         <div className={`game background-${backGroundColor}`}>
             {showPicker && <ColorPicker onPick={handleColorPicker}/>}
             {showWinningScreen && <WinningScreen winner={winner} onClick={resetCards}/>}            
+            {actionMsg && <div className="action-popup">{actionMsg}</div>}
             <button className="rearrange-cards" onClick={() => {
                 const updatedPlayers = players.map((player, i) =>
                     i === currentPlayer ? { ...player, hand: arrangeCards(player.hand) } : player
@@ -202,8 +203,8 @@ export default function Game(){
             }}>ARRANGE CARDS</button>
             <Hand 
                 className="hand comp-hand"
-                cards={players[1].hand}
-                onCardClick={(card, index)=> playCard(card, index,"computer" )}
+                player={players[1]}
+                onCardClick={(card, index)=> playCard(card, index)}
             />
             <Board 
                 drawPile={drawPile} 
@@ -213,8 +214,8 @@ export default function Game(){
             />
             <Hand 
                 className="hand player-hand"
-                cards={players[0].hand}
-                onCardClick={(card, index)=> playCard(card, index, "player")}
+                player={players[0]}
+                onCardClick={(card, index)=> playCard(card, index)}
             />
         </div>
         

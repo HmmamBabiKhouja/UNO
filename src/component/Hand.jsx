@@ -1,6 +1,7 @@
 import Card from "./Card"
 
-export default function Hand({ cards, className, onCardClick }) {
+export default function Hand({ player, className, onCardClick }) {
+  const cards= player.hand
   return (
     <div className={` ${className}`}>
       {cards.map((card, index) => {
