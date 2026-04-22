@@ -281,11 +281,11 @@ html{
 }
 
 .rearrange-cards{
-  display: fixed;
+  position: fixed;
   top: 20px;
   right: 20px;
-  width:12rem;
-
+  width:9rem;
+  text-align: center;
 }
 
 .rearrange-cards,
