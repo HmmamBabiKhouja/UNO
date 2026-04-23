@@ -51,8 +51,9 @@ export default function Game(){
     }
 
     const showAction = (msg)=>{
+        console.log(msg)
         setActionMsg(msg)
-        setTimeout(setActionMsg(null), 1200)
+        setTimeout(() => setActionMsg(null), 1200)
     }
 
     const handleColorPicker =(color)=>{
@@ -102,22 +103,24 @@ export default function Game(){
         initGame();
     }
 
-    const playCard =(card, index)=>{
+    const playCard =(card, index, player)=>{
 
         const topCard = discardPile[discardPile.length-1]
 
-        if(card.color === currentColor ||
-            card.value === topCard.value ||
-            card.color === "wild"){
-                    const updatedPlayerHand = players[currentPlayer].hand.filter ((_, i) =>i!== index)
-                    const updatedPlayers = players.map((player, i)=>
-                        i===currentPlayer? {...player,hand:updatedPlayerHand}: player
-                    )
-                    setPlayers(updatedPlayers)
-                    if(updatedPlayerHand.length===0){
-                        setShowWinningScreen(true)
-                        setWinner(currentPlayer)
-                    }        
+        if(currentPlayer===player){
+            if(card.color === currentColor ||
+                card.value === topCard.value ||
+                card.color === "wild"){
+                const updatedPlayerHand = players[currentPlayer].hand.filter((_, i) => i!==index)
+                const updatedPlayers = players.map((player, i)=>
+                    i===currentPlayer? {...player,hand:updatedPlayerHand}: player
+                )
+                setPlayers(updatedPlayers)
+                if(updatedPlayerHand.length===0){
+                    setShowWinningScreen(true)
+                    setWinner(currentPlayer.name)
+                }
+
                 if(card.value===topCard.value){
                     setCurrentColor(card.color)
                     setBackGroundColor(card.color)
@@ -134,30 +137,28 @@ export default function Game(){
                     const cardsToDraw = drawPile.slice(-cardsToAdd);
                     setDrawPile(prev => prev.slice(0, -cardsToAdd));
                     const nextPlayerIndex = (currentPlayer+direction+players.length)%players.length
-                    const updatedPlayersWithdraw = players.map((player, i)=>
+                    const updatedPlayersWithdraw = updatedPlayers.map((player, i)=>
                         i=== nextPlayerIndex? {...player, hand:[...player.hand, ...cardsToDraw]}:player)
                     setPlayers(updatedPlayersWithdraw);
-                }
-
+                }    
 
                 if(card.value === "skip"){
                     setCurrentPlayer( prev => (prev+direction+players.length) % players.length)
                     showAction("⛔ Skip!");
-                    return
                 }
-
+                
                 if(card.value === "reverse") {
-                    setDirection(prev => -prev);
                     // For 2 players, reverse acts like skip
                     if (players.length === 2) {
                         setCurrentPlayer(prev => (prev + direction + players.length) % players.length);
                     }
+                    setDirection(prev => -prev);
                     showAction("🔄 Reverse!");
-                    return;
                 }
                 // Switch turns
                 setCurrentPlayer(prev => (prev + direction + players.length) % players.length);
             }
+        }    
     }
 
     const drawCard =()=>{
@@ -187,7 +188,6 @@ export default function Game(){
         }, 600) 
 
         setCurrentPlayer((currentPlayer+direction+players.length)%players.length)
-        console.log(players[currentPlayer].hand)
     }
 
     return (
@@ -204,7 +204,7 @@ export default function Game(){
             <Hand 
                 className="hand comp-hand"
                 player={players[1]}
-                onCardClick={(card, index)=> playCard(card, index)}
+                onCardClick={(card, index)=> playCard(card, index,1)}
             />
             <Board 
                 drawPile={drawPile} 
@@ -215,7 +215,7 @@ export default function Game(){
             <Hand 
                 className="hand player-hand"
                 player={players[0]}
-                onCardClick={(card, index)=> playCard(card, index)}
+                onCardClick={(card, index)=> playCard(card, index,0)}
             />
         </div>
         

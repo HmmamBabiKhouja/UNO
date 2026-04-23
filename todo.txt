@@ -1,5 +1,3 @@
-* - the logic of sides of the game has crashed 
-* - skip and reverse doesnt show the message
 * - computer auto play
 * - add 4 players
 ------------------------------------------
