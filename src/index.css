@@ -18,8 +18,6 @@ html{
   height: 100%;
   font-size: 16px;
   font-family: Arial, Helvetica, sans-serif;;
-  /* font-family: "Comic Sans MS", "Comic Sans", cursive; */
-  /* color: rgba(255, 255, 255, 0.87); */
   background-color: var(--white);
   overflow: hidden;
 }
@@ -35,6 +33,7 @@ html{
   height: 8rem;
   border-radius: 0.8rem;
   margin: 0.8rem;
+  margin-right: -2.5rem;
   box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.3);
   color: white;
   font-size: 1.5rem;
@@ -44,9 +43,10 @@ html{
   align-items: center;
   
   text-transform: uppercase;
-  transition: transform 0.2s ease;
   cursor: pointer;
   overflow: hidden;
+  position: relative;
+  transition: transform 0.2s ease;
 }
 
 .card:hover{
@@ -135,14 +135,59 @@ html{
 }
 
 .game{
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: grid;
+  grid-template-areas: 
+    "left  top  right"
+    "left  board  right"
+    "left  bottom  right";
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   height: 100vh;
-  padding: 20px;
+  width: 100%
+}
+
+.middle {
+  display: contents;
+}
+
+.top { grid-area : top; }
+.bottom{ grid-area : bottom }
+.left { grid-area: left; }
+.right { grid-area: right; }
+
+.top,
+.bottom{
+  gap:1rem;
+}
+
+.left,
+.right {
+  grid-row: 1 / -1;
+  flex-direction: column;
+}
+
+.top .card{
+  transform: rotate(180deg);
+}
+
+.left .card{
+  transform: rotate(90deg);
+  margin-top: -60px;
+}
+
+.right .card{
+  transform: rotate(-90deg);
+  margin-top: -60px;
+}
+
+/* Horizontal wrapping for top/bottom */
+.top .hand,
+.bottom .hand {
+  flex-wrap: wrap;
 }
 
 .board{
+  grid-area : board;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -151,9 +196,8 @@ html{
 
 .discard-pile .card{
   box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-    /* box-shadow: 0 10px 20px rgba(0,0,0,0.5); */
-
 }
+
 .back:hover,
 .discard-pile .card:hover {
   transform: none;
@@ -164,14 +208,13 @@ html{
 }
 
 .hand{
-  position: relative;
-  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  transform: translate(0,-50px)
-}
-
-.comp-hand{
-  transform: translate(0,50px) rotate(180deg);
+  height: 100%;
+  padding: 10px;
+  overflow: auto;
 }
 
 .win-screen,
@@ -222,18 +265,6 @@ html{
   box-shadow: 0 5px 15px rgba(255,255,255,0.3);
 }
 
-
-.card-wrapper {
-  position: absolute;
-  bottom: 0;
-  transition: transform 0.2s;
-}
-
-.card-wrapper:hover {
-  transform: translateY(-20px) scale(1.1);
-  z-index: 10;
-}
-
 .card.back {
   background: black;
   border: 0.4rem solid white;
@@ -280,15 +311,6 @@ html{
   font-size: 2rem;
 }
 
-.rearrange-cards{
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width:9rem;
-  text-align: center;
-}
-
-.rearrange-cards,
 .win-screen>button{
   background: linear-gradient(135deg, #ff3d00, #ffcc00);
   color: white;
@@ -303,19 +325,13 @@ html{
   transition: all 0.2s ease;
 }
 
-.rearrange-cards:hover,
 .win-screen>button:hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 6px 16px rgba(0,0,0,0.35);
 }
 
-.rearrange-cards:active,
 .win-screen>button:active {
   transform: scale(0.95);
-}
-
-.card.drawn {
-  animation: drawCard 0.4s ease-out;
 }
 
 @keyframes drawCard {

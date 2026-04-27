@@ -20,6 +20,16 @@ export default function Game(){
             id:1,
             name:"player 1",
             hand:[]
+        },
+        {
+            id:2,
+            name:"player 2",
+            hand:[]
+        },
+        {
+            id:3,
+            name:"player 3",
+            hand:[]
         }
     ])
 
@@ -104,7 +114,7 @@ export default function Game(){
     }
 
     const playCard =(card, index, player)=>{
-
+        console.log(player)
         const topCard = discardPile[discardPile.length-1]
 
         if(currentPlayer===player){
@@ -118,7 +128,7 @@ export default function Game(){
                 setPlayers(updatedPlayers)
                 if(updatedPlayerHand.length===0){
                     setShowWinningScreen(true)
-                    setWinner(currentPlayer.name)
+                    setWinner(players[currentPlayer].name)
                 }
 
                 if(card.value===topCard.value){
@@ -131,6 +141,9 @@ export default function Game(){
                     setShowPicker(true)
                 }
                 
+                let newDirection = direction
+                let steps =1;
+
                 if(card.value === "+4"||card.value==="+2"){
                     const cardsToAdd = parseInt(card.value, 10)
                     // Draw 4 cards for the opponent
@@ -140,27 +153,37 @@ export default function Game(){
                     const updatedPlayersWithdraw = updatedPlayers.map((player, i)=>
                         i=== nextPlayerIndex? {...player, hand:[...player.hand, ...cardsToDraw]}:player)
                     setPlayers(updatedPlayersWithdraw);
+                    steps=2;
                 }    
 
                 if(card.value === "skip"){
-                    setCurrentPlayer( prev => (prev+direction+players.length) % players.length)
+                    steps=2;
                     showAction("⛔ Skip!");
                 }
                 
                 if(card.value === "reverse") {
                     // For 2 players, reverse acts like skip
                     if (players.length === 2) {
-                        setCurrentPlayer(prev => (prev + direction + players.length) % players.length);
+                        steps=2;
+                    }else{
+                        newDirection=-direction
                     }
-                    setDirection(prev => -prev);
+
                     showAction("🔄 Reverse!");
                 }
                 // Switch turns
-                setCurrentPlayer(prev => (prev + direction + players.length) % players.length);
+                setDirection(newDirection);
+                setCurrentPlayer(prev => (prev + newDirection * steps + players.length) % players.length);
             }
         }    
     }
 
+    const getPlayerClass =(i) =>{
+        if(i === 1) return "left"
+        if(i === 2) return "top"
+        if(i === 3) return "right"
+        return "bottom"
+    }
     const drawCard =()=>{
         if(drawPile.length=== 0){
             const newDeck = getNewShffledDeck();
@@ -173,14 +196,18 @@ export default function Game(){
             ...drawnCard,
             isNew: true
         }
+
         setDrawPile(prev => prev.slice(0, -1))
         const updatedPlayers = players.map((player, i) =>
-            i === currentPlayer ? { ...player, hand: [...player.hand, newCard] } : player
+            i === currentPlayer ? { ...player, hand: arrangeCards([...player.hand, newCard]) } : player
         );
+
         setPlayers(updatedPlayers);
         const playerIndex = currentPlayer;
         setTimeout(() =>{
+
             setPlayers(prevPlayers => prevPlayers.map((player, i) =>
+                
                 i === playerIndex ? { ...player, hand: player.hand.map(card =>
                     card.isNew ? {...card, isNew: false} : card
                 )} : player
@@ -195,26 +222,32 @@ export default function Game(){
             {showPicker && <ColorPicker onPick={handleColorPicker}/>}
             {showWinningScreen && <WinningScreen winner={winner} onClick={resetCards}/>}            
             {actionMsg && <div className="action-popup">{actionMsg}</div>}
-            <button className="rearrange-cards" onClick={() => {
-                const updatedPlayers = players.map((player, i) =>
-                    i === currentPlayer ? { ...player, hand: arrangeCards(player.hand) } : player
-                );
-                setPlayers(updatedPlayers);
-            }}>ARRANGE CARDS</button>
             <Hand 
-                className="hand comp-hand"
-                player={players[1]}
-                onCardClick={(card, index)=> playCard(card, index,1)}
+                player={players[2]}
+                className={`hand ${getPlayerClass(players[2].id)}`}
+                onCardClick={(card, index)=> playCard(card, index,2)}
             />
-            <Board 
-                drawPile={drawPile} 
-                discardPile={discardPile} 
-                topCard={topCard} 
-                drawCard={drawCard} 
-            />
+            <div className="middle">
+                <Hand 
+                    player={players[1]}
+                    className={`hand ${getPlayerClass(players[1].id)}`}
+                    onCardClick={(card, index)=> playCard(card, index,1)}
+                />
+                <Board 
+                    drawPile={drawPile} 
+                    discardPile={discardPile} 
+                    topCard={topCard} 
+                    drawCard={drawCard} 
+                />
+                <Hand 
+                    player={players[3]}
+                    className={`hand ${getPlayerClass(players[3].id)}`}
+                    onCardClick={(card, index)=> playCard(card, index,3)}
+                />
+            </div>
             <Hand 
-                className="hand player-hand"
                 player={players[0]}
+                className={`hand ${getPlayerClass(players[0].id)}`}
                 onCardClick={(card, index)=> playCard(card, index,0)}
             />
         </div>

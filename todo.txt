@@ -1,7 +1,8 @@
-* - computer auto play
-* - add 4 players
+* - computer auto plays
+* - set the hand cards into hand grip
+* - sides draw card look ugly 
 ------------------------------------------
-* - remove the tilt thing
-* - make +4 and +2 can be overplayed with other +2 and +4
+* - make +4 and +2 can be overplayed with other +2 and +4 or pass into next player
 * - hide the computer cards
 * - remove the square thing and replace it with rotated oval mixed colors
+
