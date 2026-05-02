@@ -124,4 +124,4 @@ export const shuffleDeck = (deck)=>{
     return newDeck
 };
 
-export const getNewShffledDeck = () => shuffleDeck(UNOdeck)
+export const getNewShuffledDeck = () => shuffleDeck(UNOdeck)

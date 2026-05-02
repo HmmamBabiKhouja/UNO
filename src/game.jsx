@@ -1,5 +1,5 @@
-import {useState, useEffect} from "react";
-import {getNewShffledDeck} from "./component/utility/Deck";
+import {useState, useEffect, useRef} from "react";
+import {getNewShuffledDeck} from "./component/utility/Deck";
 import Card from "./component/Card"
 import Board from "./component/Board"
 import _default from "eslint-plugin-react-refresh";
@@ -21,16 +21,16 @@ export default function Game(){
             name:"player 1",
             hand:[]
         },
-        {
-            id:2,
-            name:"player 2",
-            hand:[]
-        },
-        {
-            id:3,
-            name:"player 3",
-            hand:[]
-        }
+        // {
+        //     id:2,
+        //     name:"player 2",
+        //     hand:[]
+        // },
+        // {
+        //     id:3,
+        //     name:"player 3",
+        //     hand:[]
+        // }
     ])
 
     const [actionMsg, setActionMsg] = useState(null)
@@ -44,10 +44,38 @@ export default function Game(){
     const [showWinningScreen, setShowWinningScreen] = useState(false)
     const [winner, setWinner] = useState("")
     const topCard = discardPile[discardPile.length-1]
+    const opponentMemory = useRef({
+        colorLack: { red: 0, blue: 0, green: 0, yellow: 0 }
+    }).current;
 
     useEffect(() =>{
         initGame();
     },[])
+
+    useEffect(() =>{
+        if(players[currentPlayer]?.name !=="you"){
+            const timer = setTimeout(() => {
+                const opponentIndex = (currentPlayer - direction + players.length)% players.length;
+                const move =bestMove(
+                    players[currentPlayer].hand,
+                    players[opponentIndex].hand,
+                );
+
+                if(!move){
+                    drawCard();
+                    return
+                }
+
+                playCard(move.card, move.index, currentPlayer);
+
+                if(move.color){
+                    handleColorPicker(move.color)
+                }
+            }, 1000);
+            
+            return () => clearTimeout(timer)
+        }
+    },[currentPlayer, players, direction])
 
     const arrangeCards = (handCards)=>{
         const colors = ["blue", "green", "red", "yellow", "wild"]
@@ -60,8 +88,122 @@ export default function Game(){
         return newCards
     }
 
+    const updateOpponentLack=({playedCard, drewCard})=>{
+        if(drewCard){
+            opponentMemory.colorLack[currentColor]+=2;
+        }
+
+        if(playedCard){
+            opponentMemory.colorLack[currentColor]-=1;
+        }
+    }
+
+    const bestMove = (curr, opponent) =>{
+
+        const possibleCards = curr;
+        const colorCount = possibleCards.reduce((acc, card)=>{ acc[card.color]=(acc[card.color]||0)+1; return acc },{})
+        const colors = Object.keys(colorCount).filter(card=> card!== "wild");
+        const mostColor=colors.length?colors.reduce((a, b) => colorCount[a] > colorCount[b]? a : b):currentColor;
+
+        const validCards = curr.filter((card)=>
+            card.color===currentColor||
+            card.value===topCard.value||
+            card.value==="wild"
+        );
+
+        if(validCards.length === 0) return null;
+        
+        const pickBestColor = () =>{
+            const colors = ["red", "blue", "green", "yellow"]
+
+            return colors.reduce((best, color)=>{
+
+                const my = colorCount[color]|| 0
+                const oppo = opponentMemory.colorLack[color]|| 0
+
+                const score = my*2 + oppo*3;
+                
+                return score > (best.score || -Infinity)
+                    ? { color, score }
+                    : best;
+            }, {}).color;
+        }
+
+        const getScore = (card) => {
+            let score = 0;
+
+            const isOffColor = currentColor !== mostColor;
+            const opponentClose = opponent.length <= 2;
+
+            // 🏁 Endgame
+            if (curr.length <= 2) {
+                if (card.value === "+4") score += 10;  // strongest attack
+                if (card.value === "+2") score += 8;
+                if (card.value === "skip") score += 9;
+            }
+
+            if (!opponentClose) {
+                if (card.value === "+2") score -= 2;
+                if (card.value === "skip") score -= 2;
+            }
+
+            // 💥 Attack (no stacking now)
+            if (card.value === "+4"){
+                if(opponentClose) score+=12;
+                else if( curr.length <=2) score+=10;
+                else score +=7
+            }
+            if (card.value === "+2") score += opponentClose ? 8 : 5;
+
+            // ⛔ Control
+            if (card.value === "skip") score += opponentClose ? 9 : 5;
+            if (card.value === "reverse") score += 3;
+
+            // 🎯 Matching
+            if (card.color === currentColor) score += 4;
+            if (card.value === topCard.value) score += 3;
+
+            // 🎨 Stay in strong color
+            if (card.color === mostColor && currentColor === mostColor) {
+                score += 3;
+            }
+
+            // 😈 Target opponent weakness
+            if (opponentMemory.colorLack[card.color] > 2) {
+                score += 6;
+            }
+
+            // 🃏 Wild logic (no stacking version)
+            if (card.color === "wild") {
+                if (curr.length <= 2) score += 10;      // secure win
+                else if (isOffColor) score += 7;        // fix bad color
+                else score -= 3;                        // save it
+            }
+
+            return score;
+        };
+
+        let bestIndex = 0;
+        let bestScore =-Infinity;
+
+        validCards.forEach((card, i)=>{
+            const score = getScore(card)
+            if(score>bestScore){
+                bestScore=score
+                bestIndex=i
+            }
+        })
+            
+        const chosenCard = validCards[bestIndex];
+
+        return {
+            index: curr.indexOf(chosenCard),
+            card: chosenCard,
+            color: chosenCard.color === "wild" ? pickBestColor() : null
+        };
+    }
+
     const showAction = (msg)=>{
-        console.log(msg)
         setActionMsg(msg)
         setTimeout(() => setActionMsg(null), 1200)
     }
@@ -72,7 +214,7 @@ export default function Game(){
         setBackGroundColor(color)
     }
 
-    const removeWildBeggin =(card, pile)=>{
+    const removeWildBegin =(card, pile)=>{
         const randomIndex = Math.floor(Math.random() * pile.length);
         const newPile = [...pile];
         const replacementCard = newPile[randomIndex];
@@ -83,7 +225,7 @@ export default function Game(){
     }
 
     const initGame = () => {
-        const newDeck = getNewShffledDeck();
+        const newDeck = getNewShuffledDeck();
         const updatedPlayers = players.map((player, i)=> ({
             ...player,
             hand: arrangeCards(newDeck.slice(i*7, (i+1)*7))
@@ -98,7 +240,7 @@ export default function Game(){
         setShowPicker(false);
 
         if(firstCard.color === "wild"){
-            const initialColor = removeWildBeggin(firstCard, remainingDeck);
+            const initialColor = removeWildBegin(firstCard, remainingDeck);
             setCurrentColor(initialColor);
             setBackGroundColor(initialColor);
         } else {
@@ -114,9 +256,8 @@ export default function Game(){
     }
 
     const playCard =(card, index, player)=>{
-        console.log(player)
         const topCard = discardPile[discardPile.length-1]
-
+        
         if(currentPlayer===player){
             if(card.color === currentColor ||
                 card.value === topCard.value ||
@@ -137,7 +278,7 @@ export default function Game(){
                 }// update current color when cards played by value
                 setDiscardPile(prev => [...prev, card])
                 // Handle special cards
-                if(card.color === "wild"){
+                if(card.color === "wild" && players[currentPlayer].name === "you"){
                     setShowPicker(true)
                 }
                 
@@ -179,14 +320,15 @@ export default function Game(){
     }
 
     const getPlayerClass =(i) =>{
-        if(i === 1) return "left"
-        if(i === 2) return "top"
-        if(i === 3) return "right"
+        if(i === 1) return "top"
+        // if(i === 2) return "top"
+        // if(i === 3) return "right"
         return "bottom"
     }
+
     const drawCard =()=>{
         if(drawPile.length=== 0){
-            const newDeck = getNewShffledDeck();
+            const newDeck = getNewShuffledDeck();
             setDeck(newDeck);
             setDrawPile(newDeck);
         } 
@@ -205,7 +347,6 @@ export default function Game(){
         setPlayers(updatedPlayers);
         const playerIndex = currentPlayer;
         setTimeout(() =>{
-
             setPlayers(prevPlayers => prevPlayers.map((player, i) =>
                 
                 i === playerIndex ? { ...player, hand: player.hand.map(card =>
@@ -214,7 +355,8 @@ export default function Game(){
             ));
         }, 600) 
 
-        setCurrentPlayer((currentPlayer+direction+players.length)%players.length)
+        const nextPlayer = (currentPlayer+direction+players.length)%players.length
+        setCurrentPlayer(nextPlayer)
     }
 
     return (
@@ -223,27 +365,27 @@ export default function Game(){
             {showWinningScreen && <WinningScreen winner={winner} onClick={resetCards}/>}            
             {actionMsg && <div className="action-popup">{actionMsg}</div>}
             <Hand 
-                player={players[2]}
-                className={`hand ${getPlayerClass(players[2].id)}`}
-                onCardClick={(card, index)=> playCard(card, index,2)}
+                player={players[1]}
+                className={`hand ${getPlayerClass(players[1].id)}`}
+                // onCardClick={(card, index)=> playCard(card, index,1)}
             />
             <div className="middle">
-                <Hand 
+                {/* <Hand 
                     player={players[1]}
                     className={`hand ${getPlayerClass(players[1].id)}`}
                     onCardClick={(card, index)=> playCard(card, index,1)}
-                />
+                /> */}
                 <Board 
                     drawPile={drawPile} 
                     discardPile={discardPile} 
                     topCard={topCard} 
                     drawCard={drawCard} 
                 />
-                <Hand 
+                {/* <Hand 
                     player={players[3]}
                     className={`hand ${getPlayerClass(players[3].id)}`}
                     onCardClick={(card, index)=> playCard(card, index,3)}
-                />
+                /> */}
             </div>
             <Hand 
                 player={players[0]}
