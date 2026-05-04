@@ -21,16 +21,16 @@ export default function Game(){
             name:"player 1",
             hand:[]
         },
-        // {
-        //     id:2,
-        //     name:"player 2",
-        //     hand:[]
-        // },
-        // {
-        //     id:3,
-        //     name:"player 3",
-        //     hand:[]
-        // }
+        {
+            id:2,
+            name:"player 2",
+            hand:[]
+        },
+        {
+            id:3,
+            name:"player 3",
+            hand:[]
+        }
     ])
 
     const [actionMsg, setActionMsg] = useState(null)
@@ -71,7 +71,7 @@ export default function Game(){
                 if(move.color){
                     handleColorPicker(move.color)
                 }
-            }, 1000);
+            }, 1500);
             
             return () => clearTimeout(timer)
         }
@@ -119,9 +119,9 @@ export default function Game(){
             return colors.reduce((best, color)=>{
 
                 const my = colorCount[color]|| 0
-                const oppo = opponentMemory.colorLack[color]|| 0
+                const opponent = opponentMemory.colorLack[color]|| 0
 
-                const score = my*2 + oppo*3;
+                const score = my*2 + opponent*3;
                 
                 return score > (best.score || -Infinity)
                     ? { color, score }
@@ -320,10 +320,18 @@ export default function Game(){
     }
 
     const getPlayerClass =(i) =>{
-        if(i === 1) return "top"
-        // if(i === 2) return "top"
-        // if(i === 3) return "right"
+        if(i === 1) return "left"
+        if(i === 2) return "top"
+        if(i === 3) return "right"
         return "bottom"
+    }
+
+    const drawCardForME = () =>{
+        if(players[currentPlayer].name === "you"){
+            drawCard();
+        }else{
+            return
+        }
     }
 
     const drawCard =()=>{
@@ -353,7 +361,7 @@ export default function Game(){
                     card.isNew ? {...card, isNew: false} : card
                 )} : player
             ));
-        }, 600) 
+        }, 3000) 
 
         const nextPlayer = (currentPlayer+direction+players.length)%players.length
         setCurrentPlayer(nextPlayer)
@@ -364,34 +372,39 @@ export default function Game(){
             {showPicker && <ColorPicker onPick={handleColorPicker}/>}
             {showWinningScreen && <WinningScreen winner={winner} onClick={resetCards}/>}            
             {actionMsg && <div className="action-popup">{actionMsg}</div>}
-            <Hand 
-                player={players[1]}
-                className={`hand ${getPlayerClass(players[1].id)}`}
-                // onCardClick={(card, index)=> playCard(card, index,1)}
-            />
+            <div className={`player-area ${currentPlayer===2? "active":""} ${getPlayerClass(players[2].id)}`}>
+                <Hand 
+                    player={players[2]}
+                    className="hand"
+                />
+            </div>
             <div className="middle">
-                {/* <Hand 
-                    player={players[1]}
-                    className={`hand ${getPlayerClass(players[1].id)}`}
-                    onCardClick={(card, index)=> playCard(card, index,1)}
-                /> */}
+                <div className={`player-area ${currentPlayer===1? "active":""} ${getPlayerClass(players[1].id)}`}>
+                    <Hand 
+                        player={players[1]}
+                        className="hand"
+                    />
+                </div>
                 <Board 
                     drawPile={drawPile} 
                     discardPile={discardPile} 
                     topCard={topCard} 
-                    drawCard={drawCard} 
+                    drawCard={drawCardForME} 
                 />
-                {/* <Hand 
-                    player={players[3]}
-                    className={`hand ${getPlayerClass(players[3].id)}`}
-                    onCardClick={(card, index)=> playCard(card, index,3)}
-                /> */}
+                <div className={`player-area ${currentPlayer===3? "active":""} ${getPlayerClass(players[3].id)}`}>
+                    <Hand 
+                        player={players[3]}
+                        className="hand"
+                    />
+                </div>
             </div>
-            <Hand 
-                player={players[0]}
-                className={`hand ${getPlayerClass(players[0].id)}`}
-                onCardClick={(card, index)=> playCard(card, index,0)}
-            />
+            <div className={`player-area ${currentPlayer===0? "active":""} ${getPlayerClass(players[0].id)}`}>
+                <Hand 
+                    player={players[0]}
+                    className="hand"
+                    onCardClick={(card, index)=> playCard(card, index,0)}
+                />
+            </div>    
         </div>
         
     )

@@ -1,8 +1,5 @@
-* - computer auto plays
-* - set the hand cards into hand grip
-* - sides draw card look ugly 
+* - playing card look ugly 
+* - need a glowing area that shows who is turn right now
 ------------------------------------------
-* - make +4 and +2 can be overplayed with other +2 and +4 or pass into next player
-* - hide the computer cards
-* - remove the square thing and replace it with rotated oval mixed colors
+
 

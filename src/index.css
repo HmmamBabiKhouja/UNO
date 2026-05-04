@@ -33,25 +33,10 @@ html{
   height: 8rem;
   border-radius: 0.8rem;
   margin: 0.8rem;
-  margin-right: -2.5rem;
-  box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.3);
+  margin-right: 0rem;
   color: white;
   font-size: 1.5rem;
-  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
   text-transform: uppercase;
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-  transition: transform 0.2s ease;
-}
-
-.card:hover{
-  transform: translateY(-1rem);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
 
 .card-content{
@@ -150,40 +135,98 @@ html{
   display: contents;
 }
 
-.top { grid-area : top; }
-.bottom{ grid-area : bottom }
+/* Grid positioning */
+.top { grid-area: top; }
 .left { grid-area: left; }
 .right { grid-area: right; }
+.bottom { grid-area: bottom; }
 
-.top,
-.bottom{
-  gap:1rem;
-}
-
+/* Layout for side areas */
 .left,
 .right {
   grid-row: 1 / -1;
-  flex-direction: column;
 }
 
-.top .card{
+/* Base hand layout */
+.hand {
+  display: flex;
+  align-items: center;
+}
+
+/* =========================
+  TOP & BOTTOM (horizontal)
+========================= */
+
+.top .hand,
+.bottom .hand {
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 1rem;
+}
+
+/* Overlap effect */
+.top .hand .card:not(:first-child),
+.bottom .hand .card:not(:first-child) {
+  margin-left: -2rem;
+}
+
+/* Bottom (player) interactivity */
+.bottom .card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+  transform: rotate(var(--angle, 0deg));
+}
+
+.bottom .card:hover {
+  transform: translateY(-1rem) rotate(var(--angle, 0deg));
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+
+/* =========================
+  LEFT & RIGHT (vertical)
+========================= */
+
+.left .hand,
+.right .hand {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Vertical stacking */
+.left .hand .card:not(:first-child),
+.right .hand .card:not(:first-child) {
+  margin-top: -60px;
+}
+
+/* =========================
+  CARD ROTATIONS
+========================= */
+
+.top .card {
   transform: rotate(180deg);
 }
 
-.left .card{
+.left .card {
   transform: rotate(90deg);
-  margin-top: -60px;
 }
 
-.right .card{
+.right .card {
   transform: rotate(-90deg);
-  margin-top: -60px;
 }
 
-/* Horizontal wrapping for top/bottom */
-.top .hand,
-.bottom .hand {
-  flex-wrap: wrap;
+/* Disable interaction for opponents */
+.top .card,
+.left .card,
+.right .card {
+  pointer-events: none;
 }
 
 .board{
@@ -209,12 +252,10 @@ html{
 
 .hand{
   display: flex;
-  justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
   padding: 10px;
-  overflow: auto;
 }
 
 .win-screen,
@@ -258,6 +299,10 @@ html{
   cursor: pointer;
 
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.draw-button{
+  cursor: pointer;
 }
 
 .color-btn:hover {
@@ -334,22 +379,6 @@ html{
   transform: scale(0.95);
 }
 
-@keyframes drawCard {
-  0% {
-    transform: translateY(-80px) scale(0.7);
-    opacity: 0;
-  }
-
-  60% {
-    transform: translateY(10px) scale(1.05);
-  }
-
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
 .action-popup {
   position: absolute;
   top: 40%;
@@ -384,5 +413,35 @@ html{
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+.player-area{
+  padding: 20px;
+  margin: 1.4rem;
+  border-radius: 12px;
+  transition: all 0.4s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  opacity: 0.4;
+  transform: scale(0.98);
+}
+
+.player-area.active {
+  border: 2px solid #ffffff;
+  animation: glowPulse 1.5s infinite alternate;
+  opacity: 1;
+  transform: scale(1);
+}
+
+@keyframes glowPulse {
+  from {
+    box-shadow: 0 0 10px #ffffff;
+  }
+  to {
+    box-shadow: 0 0 30px #ffffff,
+                0 0 60px #ffffff;
   }
 }
