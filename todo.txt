@@ -1,5 +1,1 @@
-* - playing card look ugly 
-* - need a glowing area that shows who is turn right now
-------------------------------------------
-
-
+1 add a way to know the direction 

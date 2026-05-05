@@ -1,4 +1,5 @@
 import {useState, useEffect, useRef} from "react";
+import useSound from 'use-sound';
 import {getNewShuffledDeck} from "./component/utility/Deck";
 import Card from "./component/Card"
 import Board from "./component/Board"
@@ -6,6 +7,8 @@ import _default from "eslint-plugin-react-refresh";
 import ColorPicker from "./component/ColorPicker";
 import Hand from "./component/Hand"
 import WinningScreen from "./component/WinningScreen";
+import playSound from "./sounds/playCard.mp3"
+import drawSound from "./sounds/drawCard.mp3"
 
 
 export default function Game(){
@@ -32,7 +35,6 @@ export default function Game(){
             hand:[]
         }
     ])
-
     const [actionMsg, setActionMsg] = useState(null)
     const [direction, setDirection] = useState(1)
     const [drawPile, setDrawPile] = useState([]);
@@ -44,10 +46,13 @@ export default function Game(){
     const [showWinningScreen, setShowWinningScreen] = useState(false)
     const [winner, setWinner] = useState("")
     const topCard = discardPile[discardPile.length-1]
+    const [playCardSound] = useSound(playSound, {volume:0.5})
+    const [drawCardSound] = useSound(drawSound, {volume:0.5})
     const opponentMemory = useRef({
         colorLack: { red: 0, blue: 0, green: 0, yellow: 0 }
     }).current;
 
+    
     useEffect(() =>{
         initGame();
     },[])
@@ -71,7 +76,7 @@ export default function Game(){
                 if(move.color){
                     handleColorPicker(move.color)
                 }
-            }, 1500);
+            }, 4000);
             
             return () => clearTimeout(timer)
         }
@@ -256,6 +261,7 @@ export default function Game(){
     }
 
     const playCard =(card, index, player)=>{
+        playCardSound()
         const topCard = discardPile[discardPile.length-1]
         
         if(currentPlayer===player){
@@ -340,7 +346,7 @@ export default function Game(){
             setDeck(newDeck);
             setDrawPile(newDeck);
         } 
-        
+        drawCardSound()
         const drawnCard = drawPile[drawPile.length-1];
         const newCard = {
             ...drawnCard,
@@ -361,7 +367,7 @@ export default function Game(){
                     card.isNew ? {...card, isNew: false} : card
                 )} : player
             ));
-        }, 3000) 
+        },1200) 
 
         const nextPlayer = (currentPlayer+direction+players.length)%players.length
         setCurrentPlayer(nextPlayer)
