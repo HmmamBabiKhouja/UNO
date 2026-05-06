@@ -1,1 +1,2 @@
 1 add a way to know the direction 
+3 wild cards looks ugly when played 

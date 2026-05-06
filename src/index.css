@@ -131,6 +131,38 @@ html{
   width: 100%
 }
 
+.table{
+  position: relative;
+}
+
+.table::before{
+  content : "";
+  position: absolute;
+  inset:0;
+  border-radius: 50%;
+  opacity: 0.05;
+  border: 2px dashed white;
+  pointer-events: none;
+}
+
+.table.cw::before {
+  animation: rotateCW 6s linear infinite;
+}
+
+.table.ccw::before {
+  animation: rotateCCW 6s linear infinite;
+}
+
+@keyframes rotateCW {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotateCCW {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
 .middle {
   display: contents;
 }

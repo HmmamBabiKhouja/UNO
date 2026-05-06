@@ -3,7 +3,7 @@ import useSound from 'use-sound';
 import {getNewShuffledDeck} from "./component/utility/Deck";
 import Card from "./component/Card"
 import Board from "./component/Board"
-import _default from "eslint-plugin-react-refresh";
+// import _default from "eslint-plugin-react-refresh";
 import ColorPicker from "./component/ColorPicker";
 import Hand from "./component/Hand"
 import WinningScreen from "./component/WinningScreen";
@@ -49,7 +49,9 @@ export default function Game(){
     const [playCardSound] = useSound(playSound, {volume:0.5})
     const [drawCardSound] = useSound(drawSound, {volume:0.5})
     const opponentMemory = useRef({
-        colorLack: { red: 0, blue: 0, green: 0, yellow: 0 }
+        1: { red: 0, blue: 0, green: 0, yellow: 0 },
+        2: { red: 0, blue: 0, green: 0, yellow: 0 },
+        3: { red: 0, blue: 0, green: 0, yellow: 0 },
     }).current;
 
     
@@ -59,14 +61,17 @@ export default function Game(){
 
     useEffect(() =>{
         if(players[currentPlayer]?.name !=="you"){
+            const delay = Math.random()*1500+1000;
             const timer = setTimeout(() => {
-                const opponentIndex = (currentPlayer - direction + players.length)% players.length;
+                const opponentIndex = (currentPlayer + direction + players.length)% players.length;
                 const move =bestMove(
                     players[currentPlayer].hand,
                     players[opponentIndex].hand,
+                    opponentIndex
                 );
 
                 if(!move){
+                    updateOpponentLack(currentPlayer,{drewCard:true })
                     drawCard();
                     return
                 }
@@ -76,7 +81,7 @@ export default function Game(){
                 if(move.color){
                     handleColorPicker(move.color)
                 }
-            }, 4000);
+            }, delay);
             
             return () => clearTimeout(timer)
         }
@@ -93,28 +98,32 @@ export default function Game(){
         return newCards
     }
 
-    const updateOpponentLack=({playedCard, drewCard})=>{
+    const updateOpponentLack=(playerID,{playedCard, drewCard})=>{
+        const clamp = (val, min=-5, max=5) => Math.max(min, Math.min(max, val))
+
+        if(!opponentMemory[playerID]) return
         if(drewCard){
-            opponentMemory.colorLack[currentColor]+=2;
+            opponentMemory[playerID][currentColor]=
+                clamp((opponentMemory[playerID][currentColor]||0)+2);
         }
 
         if(playedCard){
-            opponentMemory.colorLack[currentColor]-=1;
+            opponentMemory[playerID][currentColor]=
+                clamp((opponentMemory[playerID][currentColor]||0)-2);
         }
     }
 
-    const bestMove = (curr, opponent) =>{
+    const bestMove = (curr, opponent, opponentID) =>{
+        const validCards = curr.filter((card)=>
+            card.color===currentColor||
+        card.value===topCard.value||
+        card.value==="wild"
+        );
 
-        const possibleCards = curr;
+        const possibleCards = validCards.length? validCards:curr;
         const colorCount = possibleCards.reduce((acc, card)=>{ acc[card.color]=(acc[card.color]||0)+1; return acc },{})
         const colors = Object.keys(colorCount).filter(card=> card!== "wild");
         const mostColor=colors.length?colors.reduce((a, b) => colorCount[a] > colorCount[b]? a : b):currentColor;
-
-        const validCards = curr.filter((card)=>
-            card.color===currentColor||
-            card.value===topCard.value||
-            card.value==="wild"
-        );
 
         if(validCards.length === 0) return null;
         
@@ -124,8 +133,7 @@ export default function Game(){
             return colors.reduce((best, color)=>{
 
                 const my = colorCount[color]|| 0
-                const opponent = opponentMemory.colorLack[color]|| 0
-
+                const opponent = opponentMemory[opponentID]?.[color]||0;
                 const score = my*2 + opponent*3;
                 
                 return score > (best.score || -Infinity)
@@ -136,7 +144,6 @@ export default function Game(){
 
         const getScore = (card) => {
             let score = 0;
-
             const isOffColor = currentColor !== mostColor;
             const opponentClose = opponent.length <= 2;
 
@@ -174,7 +181,7 @@ export default function Game(){
             }
 
             // 😈 Target opponent weakness
-            if (opponentMemory.colorLack[card.color] > 2) {
+            if (opponentMemory[opponentID]?.[card.color] > 2) {
                 score += 6;
             }
 
@@ -261,10 +268,10 @@ export default function Game(){
     }
 
     const playCard =(card, index, player)=>{
-        playCardSound()
         const topCard = discardPile[discardPile.length-1]
-        
+        const prevColor = currentColor;
         if(currentPlayer===player){
+            playCardSound()
             if(card.color === currentColor ||
                 card.value === topCard.value ||
                 card.color === "wild"){
@@ -301,7 +308,13 @@ export default function Game(){
                         i=== nextPlayerIndex? {...player, hand:[...player.hand, ...cardsToDraw]}:player)
                     setPlayers(updatedPlayersWithdraw);
                     steps=2;
-                }    
+                }
+                
+                if(players[currentPlayer].name  !== "you" ){
+                    if(card.color===prevColor){
+                        updateOpponentLack(currentPlayer,{ playedCard:true })
+                    }
+                }
 
                 if(card.value === "skip"){
                     steps=2;
@@ -315,7 +328,6 @@ export default function Game(){
                     }else{
                         newDirection=-direction
                     }
-
                     showAction("🔄 Reverse!");
                 }
                 // Switch turns
@@ -325,26 +337,13 @@ export default function Game(){
         }    
     }
 
-    const getPlayerClass =(i) =>{
-        if(i === 1) return "left"
-        if(i === 2) return "top"
-        if(i === 3) return "right"
-        return "bottom"
-    }
-
-    const drawCardForME = () =>{
-        if(players[currentPlayer].name === "you"){
-            drawCard();
-        }else{
-            return
-        }
-    }
-
     const drawCard =()=>{
+
         if(drawPile.length=== 0){
-            const newDeck = getNewShuffledDeck();
-            setDeck(newDeck);
-            setDrawPile(newDeck);
+            const newDraw = discardPile.slice(0, -1);
+            const shuffled = newDraw.sort(()=> Math.random()-0.5)
+            setDrawPile(shuffled);
+            setDiscardPile([discardPile[discardPile.length-1]]);
         } 
         drawCardSound()
         const drawnCard = drawPile[drawPile.length-1];
@@ -373,44 +372,61 @@ export default function Game(){
         setCurrentPlayer(nextPlayer)
     }
 
+    const getPlayerClass =(i) =>{
+        if(i === 1) return "left"
+        if(i === 2) return "top"
+        if(i === 3) return "right"
+        return "bottom"
+    }
+
+    const drawCardForME = () =>{
+        if(players[currentPlayer].name === "you"){
+            drawCard();
+        }else{
+            return
+        }
+    }
+
     return (
         <div className={`game background-${backGroundColor}`}>
             {showPicker && <ColorPicker onPick={handleColorPicker}/>}
             {showWinningScreen && <WinningScreen winner={winner} onClick={resetCards}/>}            
             {actionMsg && <div className="action-popup">{actionMsg}</div>}
-            <div className={`player-area ${currentPlayer===2? "active":""} ${getPlayerClass(players[2].id)}`}>
-                <Hand 
-                    player={players[2]}
-                    className="hand"
-                />
-            </div>
-            <div className="middle">
-                <div className={`player-area ${currentPlayer===1? "active":""} ${getPlayerClass(players[1].id)}`}>
+            <div className={`table ${direction===1? "cw":"ccw"}`}>
+                <div className={`player-area ${currentPlayer===2? "active":""} ${getPlayerClass(players[2].id)}`}>
                     <Hand 
-                        player={players[1]}
+                        player={players[2]}
                         className="hand"
                     />
                 </div>
-                <Board 
-                    drawPile={drawPile} 
-                    discardPile={discardPile} 
-                    topCard={topCard} 
-                    drawCard={drawCardForME} 
-                />
-                <div className={`player-area ${currentPlayer===3? "active":""} ${getPlayerClass(players[3].id)}`}>
-                    <Hand 
-                        player={players[3]}
-                        className="hand"
+                <div className="middle">
+                    <div className={`player-area ${currentPlayer===1? "active":""} ${getPlayerClass(players[1].id)}`}>
+                        <Hand 
+                            player={players[1]}
+                            className="hand"
+                        />
+                    </div>
+                    <Board 
+                        drawPile={drawPile} 
+                        discardPile={discardPile} 
+                        topCard={topCard} 
+                        drawCard={drawCardForME} 
                     />
+                    <div className={`player-area ${currentPlayer===3? "active":""} ${getPlayerClass(players[3].id)}`}>
+                        <Hand 
+                            player={players[3]}
+                            className="hand"
+                        />
+                    </div>
                 </div>
+                <div className={`player-area ${currentPlayer===0? "active":""} ${getPlayerClass(players[0].id)}`}>
+                    <Hand 
+                        player={players[0]}
+                        className="hand"
+                        onCardClick={(card, index)=> playCard(card, index,0)}
+                    />
+                </div>    
             </div>
-            <div className={`player-area ${currentPlayer===0? "active":""} ${getPlayerClass(players[0].id)}`}>
-                <Hand 
-                    player={players[0]}
-                    className="hand"
-                    onCardClick={(card, index)=> playCard(card, index,0)}
-                />
-            </div>    
         </div>
         
     )
