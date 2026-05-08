@@ -70,10 +70,17 @@ export default function Game(){
                     opponentIndex
                 );
 
+                const hasPlayable = players[currentPlayer].hand.some(card =>
+                    card.color === currentColor ||
+                    card.value === topCard.value ||
+                    card.value === "wild"
+                );
                 if(!move){
-                    updateOpponentLack(currentPlayer,{drewCard:true })
-                    drawCard();
-                    return
+                    if(!hasPlayable){
+                        updateOpponentLack(currentPlayer,{drewCard:true })
+                        drawCard();
+                        return
+                    }
                 }
 
                 playCard(move.card, move.index, currentPlayer);
@@ -81,7 +88,7 @@ export default function Game(){
                 if(move.color){
                     handleColorPicker(move.color)
                 }
-            }, delay);
+            }, 10000000000000);
             
             return () => clearTimeout(timer)
         }
@@ -222,8 +229,12 @@ export default function Game(){
 
     const handleColorPicker =(color)=>{
         setCurrentColor(color)
-        setShowPicker(false)
         setBackGroundColor(color)
+        setShowPicker(false)
+    
+        setCurrentPlayer(prev =>
+            (prev + direction + players.length)% players.length
+        )
     }
 
     const removeWildBegin =(card, pile)=>{
@@ -290,11 +301,7 @@ export default function Game(){
                     setBackGroundColor(card.color)
                 }// update current color when cards played by value
                 setDiscardPile(prev => [...prev, card])
-                // Handle special cards
-                if(card.color === "wild" && players[currentPlayer].name === "you"){
-                    setShowPicker(true)
-                }
-                
+
                 let newDirection = direction
                 let steps =1;
 
@@ -308,6 +315,12 @@ export default function Game(){
                         i=== nextPlayerIndex? {...player, hand:[...player.hand, ...cardsToDraw]}:player)
                     setPlayers(updatedPlayersWithdraw);
                     steps=2;
+                }
+
+                // Handle special cards
+                if(card.color === "wild" && players[currentPlayer].name === "you"){
+                    setShowPicker(true)
+                    return
                 }
                 
                 if(players[currentPlayer].name  !== "you" ){
@@ -333,10 +346,10 @@ export default function Game(){
                 // Switch turns
                 setDirection(newDirection);
                 setCurrentPlayer(prev => (prev + newDirection * steps + players.length) % players.length);
-            }
-        }    
+            }   
+        }
     }
-
+    
     const drawCard =()=>{
 
         if(drawPile.length=== 0){
@@ -372,13 +385,6 @@ export default function Game(){
         setCurrentPlayer(nextPlayer)
     }
 
-    const getPlayerClass =(i) =>{
-        if(i === 1) return "left"
-        if(i === 2) return "top"
-        if(i === 3) return "right"
-        return "bottom"
-    }
-
     const drawCardForME = () =>{
         if(players[currentPlayer].name === "you"){
             drawCard();
@@ -392,40 +398,49 @@ export default function Game(){
             {showPicker && <ColorPicker onPick={handleColorPicker}/>}
             {showWinningScreen && <WinningScreen winner={winner} onClick={resetCards}/>}            
             {actionMsg && <div className="action-popup">{actionMsg}</div>}
-            <div className={`table ${direction===1? "cw":"ccw"}`}>
-                <div className={`player-area ${currentPlayer===2? "active":""} ${getPlayerClass(players[2].id)}`}>
-                    <Hand 
-                        player={players[2]}
-                        className="hand"
-                    />
-                </div>
-                <div className="middle">
-                    <div className={`player-area ${currentPlayer===1? "active":""} ${getPlayerClass(players[1].id)}`}>
-                        <Hand 
-                            player={players[1]}
-                            className="hand"
-                        />
-                    </div>
-                    <Board 
-                        drawPile={drawPile} 
-                        discardPile={discardPile} 
-                        topCard={topCard} 
-                        drawCard={drawCardForME} 
-                    />
-                    <div className={`player-area ${currentPlayer===3? "active":""} ${getPlayerClass(players[3].id)}`}>
-                        <Hand 
-                            player={players[3]}
-                            className="hand"
-                        />
-                    </div>
-                </div>
-                <div className={`player-area ${currentPlayer===0? "active":""} ${getPlayerClass(players[0].id)}`}>
-                    <Hand 
-                        player={players[0]}
-                        className="hand"
-                        onCardClick={(card, index)=> playCard(card, index,0)}
-                    />
-                </div>    
+            
+            {/* Top player */}
+            <div className={`player-area ${currentPlayer===2? "active":""} top`}>
+                <Hand 
+                    player={players[2]}
+                    className="hand"
+                />
+            </div>
+            
+            {/* Left player */}
+            <div className={`player-area ${currentPlayer===1? "active":""} left`}>
+                <Hand 
+                    player={players[1]}
+                    className="hand"
+                />
+            </div>
+            
+            {/* Board area */}
+            <div className= {`board-container ${direction===1? "cw":"ccw"}`}>
+                <Board 
+                    className="board"
+                    drawPile={drawPile} 
+                    discardPile={discardPile} 
+                    topCard={topCard} 
+                    drawCard={drawCardForME} 
+                />
+            </div>
+            
+            {/* Right player */}
+            <div className={`player-area ${currentPlayer===3? "active":""} right`}>
+                <Hand 
+                    player={players[3]}
+                    className="hand"
+                />
+            </div>
+            
+            {/* Bottom player (you) */}
+            <div className={`player-area ${currentPlayer===0? "active":""} bottom`}>
+                <Hand 
+                    player={players[0]}
+                    className="hand"
+                    onCardClick={(card, index)=> playCard(card, index,0)}
+                />
             </div>
         </div>
         

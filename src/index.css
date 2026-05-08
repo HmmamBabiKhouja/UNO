@@ -16,10 +16,12 @@ html{
   margin: 0;
   padding: 0;
   height: 100%;
+  width: 100vw;
   font-size: 16px;
   font-family: Arial, Helvetica, sans-serif;;
   background-color: var(--white);
   overflow: hidden;
+  overflow-x: hidden;
 }
 
 :root {
@@ -70,6 +72,7 @@ html{
 .background-red{
   background: var(--red);
   color: var(--red);
+  border-top-left-radius: 0.8rem;
 }
 
 .card-blue,
@@ -77,6 +80,7 @@ html{
 .background-blue {
   background: var(--blue);
   color: var(--blue);
+  border-bottom-right-radius: 0.8rem;
 }
 
 .card-green,
@@ -84,6 +88,7 @@ html{
 .background-green{
   background: var(--green);
   color: var(--green);
+  border-bottom-left-radius: 0.8rem;
 }
 
 .card-yellow,
@@ -91,6 +96,8 @@ html{
 .background-yellow{
   background: var(--yellow);
   color: var(--yellow);
+  border-top-right-radius: 0.8rem;
+
 }
 
 .card-wild{
@@ -106,7 +113,6 @@ html{
   position: relative;
   z-index: 1;
   gap: 0;
-  
 }
 
 .card-icon {
@@ -121,36 +127,70 @@ html{
 
 .game{
   display: grid;
-  grid-template-areas: 
-    "left  top  right"
-    "left  board  right"
-    "left  bottom  right";
+  grid-template-areas:
+    "left top right"
+    "left board right"
+    "left bottom right";
   grid-template-columns: 1fr 3fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
   height: 100vh;
-  width: 100%
-}
-
-.table{
+  width: 100vw;
+  margin: 0;
+  padding: 0;
   position: relative;
 }
 
-.table::before{
+.board-container{
+  grid-area: board;
+  place-self: center;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 18rem;
+  height: 18rem;
+  min-width: 18rem;
+  min-height: 18rem;
+}
+
+.board-container::before{
   content : "";
   position: absolute;
   inset:0;
   border-radius: 50%;
-  opacity: 0.05;
-  border: 2px dashed white;
+  opacity: 1;
+  border: 3px outset white;
   pointer-events: none;
+  box-shadow: 0 0 20px white;
 }
 
-.table.cw::before {
-  animation: rotateCW 6s linear infinite;
+.board{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
 }
 
-.table.ccw::before {
-  animation: rotateCCW 6s linear infinite;
+.draw-pile,
+.discard-pile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 7rem;
+  height: 10rem;
+}
+
+.board-container.cw::before {
+  animation: rotateCW 20s linear infinite;
+}
+
+.board-container.ccw::before {
+  animation: rotateCCW 20s linear infinite;
 }
 
 @keyframes rotateCW {
@@ -163,28 +203,19 @@ html{
   to { transform: rotate(-360deg); }
 }
 
-.middle {
-  display: contents;
-}
-
 /* Grid positioning */
 .top { grid-area: top; }
 .left { grid-area: left; }
 .right { grid-area: right; }
 .bottom { grid-area: bottom; }
 
-/* Layout for side areas */
+.top,
+.bottom,
 .left,
-.right {
-  grid-row: 1 / -1;
+.right{
+  min-width: 0;
+  min-height: 0;
 }
-
-/* Base hand layout */
-.hand {
-  display: flex;
-  align-items: center;
-}
-
 /* =========================
   TOP & BOTTOM (horizontal)
 ========================= */
@@ -230,6 +261,8 @@ html{
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 /* Vertical stacking */
@@ -259,14 +292,6 @@ html{
 .left .card,
 .right .card {
   pointer-events: none;
-}
-
-.board{
-  grid-area : board;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap:40px;
 }
 
 .discard-pile .card{
@@ -456,16 +481,17 @@ html{
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: auto;
-  opacity: 0.4;
-  transform: scale(0.98);
+  overflow: visible;
+  opacity: 0.5;
+  min-width: 300px;
+  min-height: 200px;
 }
 
 .player-area.active {
   border: 2px solid #ffffff;
   animation: glowPulse 1.5s infinite alternate;
   opacity: 1;
-  transform: scale(1);
+  /* transform: scale(0.98); */
 }
 
 @keyframes glowPulse {
